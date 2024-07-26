@@ -1,3 +1,14 @@
+//
+// This program is for learning assembly and is intended to read an ASM
+// instruction stream for the Intel 8086 instruction set and decode it.
+//
+//
+// Intel 8086 Manual:
+// https://edge.edx.org/c4x/BITSPilani/EEE231/asset/8086_family_Users_Manual_1_.pdf
+//
+//
+//
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>

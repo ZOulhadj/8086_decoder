@@ -69,6 +69,8 @@ const char* wide_registers[] = {
 
 int main(int argc, char** argv)
 {
+    // @TODO: Use argv to get path to asm stream instead of hard coding it.
+
     FILE* file = fopen("listing_0037_single_register_mov", "rb");
     if (!file) {
         fprintf(stderr, "Failed to open assembly ASM.\n");

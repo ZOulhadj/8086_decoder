@@ -1,7 +1,7 @@
 # 8086 decoder
 
 A project to learn about assembly and is currently work in progress. The program
-simulates /instruction decode/ and works by reading a Intel 8086 binary assembly
+simulates *instruction decode* and works by reading a Intel 8086 binary assembly
 stream and decodes it.
 
 ## Resources

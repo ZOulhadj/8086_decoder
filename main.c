@@ -50,6 +50,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -71,11 +72,23 @@ const char* word_registers[] = {
 
 int main(int argc, char** argv)
 {
-    // @TODO: Use argv to get path to asm stream instead of hard coding it.
+    // @TODO: To proper checks for args and also find a way to ensure that only
+    // the correct type of file (8086 binary stream) is used as input.
 
-    FILE* file = fopen("listing_0037_single_register_mov", "rb");
+    if (argc <= 1) {
+        fprintf(stdout, "Use --asm file.asm\n");
+        return 0;
+    }
+
+    if (argc != 3)
+        return -1;
+
+    if (strcmp(argv[1], "--asm") != 0)
+        return -1;
+
+    FILE* file = fopen(argv[2], "rb");
     if (!file) {
-        fprintf(stderr, "Failed to open assembly ASM.\n");
+        fprintf(stdout, "Failed to open assembly ASM.\n");
         return -1;
     }
 
@@ -97,30 +110,38 @@ int main(int argc, char** argv)
     fseek(file, 0, SEEK_SET);
     fread(buffer, 1, buffer_size, file);
 
-    printf("ASM (%d bytes): \n", buffer_size);
+    //printf("ASM (%d bytes): \n", buffer_size);
+
     for (s32 i = 0; i < buffer_size; i += 2) {
         u8 byte1 = buffer[i];
         u8 byte2 = buffer[i + 1];
 
-        // @TODO: Do bit stuff to get the data we want.
-        u8 op = 0;
-        u8 d = 0;
-        u8 word = byte1 & (1 << 7);
-        u8 reg = (byte2 >> 3) & 0x07;
-        u8 rm = byte2 & 0x07;
+        u8 opc = (byte1 & 0xfc) >> 2;
+        u8 dir = (byte1 & 0x02);
+        u8 wrd = (byte1 & 0x01);
 
-        const char* op_name = "mov";
+        u8 mod = (byte2 & 0xc0) >> 6;
+        u8 reg = (byte2 & 0x38) >> 3;
+        u8 rem = (byte2 & 0x07);
+
+        const char* op_name = (opc == 0x22) ? "mov" : "???";
         const char* operand1;
         const char* operand2;
-        if (word == 0) {
+
+        if (wrd == 0) {
             operand1 = byte_registers[reg];
-            operand2 = byte_registers[rm];
+            operand2 = byte_registers[rem];
         } else {
             operand1 = word_registers[reg];
-            operand2 = word_registers[rm];
+            operand2 = word_registers[rem];
         }
 
-        printf("%s %s, %s\n", op_name, operand1, operand2);
+        if (dir == 0) {
+            printf("%s %s, %s\n", op_name, operand2, operand1);
+        } else {
+            printf("%s %s, %s\n", op_name, operand1, operand2);
+        }
+
     }
 
 

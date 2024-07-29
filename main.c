@@ -57,12 +57,14 @@ typedef int32_t s32;
 typedef uint8_t u8;
 typedef size_t usize;
 
-const char* short_registers[] = {
-    "al", "cl", "dl", "b1",
+// Register look up tables
+
+const char* byte_registers[] = {
+    "al", "cl", "dl", "bl",
     "ah", "ch", "dh", "bh"
 };
 
-const char* wide_registers[] = {
+const char* word_registers[] = {
     "ax", "cx", "dx", "bx",
     "sp", "bp", "si", "di"
 };
@@ -100,28 +102,25 @@ int main(int argc, char** argv)
         u8 byte1 = buffer[i];
         u8 byte2 = buffer[i + 1];
 
-        // @TODO: Check first 6 bits against op code table
+        // @TODO: Do bit stuff to get the data we want.
+        u8 op = 0;
+        u8 d = 0;
+        u8 word = byte1 & (1 << 7);
+        u8 reg = (byte2 >> 3) & 0x07;
+        u8 rm = byte2 & 0x07;
 
-        // Check D bit
-
-        // Check W bit
-        int w = byte1 & (1 << 7);
-
-        int reg_index = (byte2 >> 3) & 0x07;
-
-        int rm_index = byte2 & 0x07;
-
+        const char* op_name = "mov";
         const char* operand1;
         const char* operand2;
-        if (w == 0) {
-            operand1 = short_registers[reg_index];
-            operand2 = short_registers[rm_index];
+        if (word == 0) {
+            operand1 = byte_registers[reg];
+            operand2 = byte_registers[rm];
         } else {
-            operand1 = wide_registers[reg_index];
-            operand2 = wide_registers[rm_index];
+            operand1 = word_registers[reg];
+            operand2 = word_registers[rm];
         }
 
-        printf("mov %s, %s\n", operand1, operand2);
+        printf("%s %s, %s\n", op_name, operand1, operand2);
     }
 
 
